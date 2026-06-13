@@ -103,5 +103,7 @@ you serve any static via Django (the SPA is served separately, so usually not).
 
 - Flash via `pio run -t upload` over USB.
 - OTA is out of scope for v1 (could be added via ESP32 OTA later).
-- Wi-Fi/API config is build-time (see [`06-firmware.md`](06-firmware.md) §6.7);
-  rebuild + reflash to change the target API.
+- Wi-Fi/API config is set **on-device at runtime** via the on-watch provisioning AP
+  + web UI and persisted to NVS (see [`06-firmware.md`](06-firmware.md) §6.10/§6.12).
+  Optional build-time defaults (git-ignored `secrets.h`) can pre-seed a dev unit;
+  NVS values take precedence, so changing the target API needs no reflash.

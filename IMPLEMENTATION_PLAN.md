@@ -77,20 +77,34 @@ delete/clear all work; reconnect after backend restart resyncs cleanly.
 
 ## Phase 4 — Firmware: T-Watch Ultra app
 
-Goal: the watch shows the live list. Ref [`specs/06-firmware.md`](specs/06-firmware.md).
+Goal: a multi-mode, low-power watch app (watch face → menu → tasks, with on-watch
+Wi-Fi provisioning). Ref [`specs/06-firmware.md`](specs/06-firmware.md). Build in
+sub-steps so each is verifiable on hardware before the next.
 
-- ⬜ Start from the **official LilyGo T-Watch Ultra PlatformIO example**; confirm BSP display+touch+LVGL boot on real hardware *before* adding networking.
-- ⬜ `include/config.h` + git-ignored `secrets.h` (Wi-Fi, `API_BASE/WS_BASE`, `API_KEY`).
-- ⬜ `net/WifiManager` — connect + reconnect + status.
-- ⬜ `net/ApiClient` — `GET /api/notes` (stream-parse array, bounded RAM), TLS via `WiFiClientSecure` (CA pin or documented `setInsecure`).
-- ⬜ `model/NoteStore` — in-RAM list, `rev` tracking, apply events / full-resync.
-- ⬜ `net/NotesSocket` — WS client (`links2004/WebSockets`): connect `?key=`, parse events, backoff reconnect, `hello`→resync, gap→resync.
-- ⬜ `ui/ui_todo` (LVGL scrollable list, recycled rows) + `ui/ui_status` (wifi/conn icon).
-- ⬜ Optional: tap=toggle, long-press=delete via WS `toggle`/`delete`.
-- ⬜ Fallback: after repeated WS failures, poll `GET /api/notes` every `POLL_INTERVAL`.
+**4a — boot & UI shell**
+- ⬜ Start from the **official LilyGo T-Watch Ultra PlatformIO example**; confirm BSP display+touch+LVGL+PMU+RTC boot on real hardware *before* networking.
+- ⬜ `storage/Settings` (NVS) + `include/config.h` defaults + git-ignored `secrets.h`.
+- ⬜ `app/ModeManager` state machine (WATCH/MENU/TASKS/PROVISIONING) + inactivity timer; back action + 30 s auto-return.
 
-🎯 **M4**: watch boots → connects Wi-Fi → loads list → a note typed in the browser
-appears on the wrist in < 1s; watch survives Wi-Fi drop (reconnect + resync).
+**4b — watch face & sensors**
+- ⬜ `time/Clock` (RTC; NTP sync when online), `sensors/Gps` (`GpsProvider`, duty-cycled; null impl if no source), battery/charge from PMU.
+- ⬜ `ui/ui_watch` (time/date/GPS/battery/conn) + `ui/ui_status` shared bar; `ui/ui_menu`.
+
+**4c — tasks (live)**
+- ⬜ `net/WifiManager` (STA connect/reconnect/status), `net/ApiClient` (`GET /api/notes`, stream-parse, TLS via `WiFiClientSecure`).
+- ⬜ `model/NoteStore` (in-RAM list, `rev` tracking, apply/resync), `net/NotesSocket` (WS, backoff, `hello`/gap→resync).
+- ⬜ `ui/ui_tasks` (LVGL scrollable list, recycled rows); optional tap=toggle, long-press=delete; close WS on leaving TASKS.
+
+**4d — provisioning**
+- ⬜ `net/Provisioning` — SoftAP `WatchTodo-Setup` + DNS captive portal + WebServer (`/`, `/save`, `/status`); scan networks, save creds+API config to NVS, switch to STA. `ui/ui_provision` shows SSID/URL/QR.
+
+**4e — power**
+- ⬜ `power/PowerManager` — `esp_pm` DFS + automatic light sleep, Wi-Fi modem sleep, backlight dim/off ladder (`DIM_MS`/`SLEEP_MS`/`DEEP_SLEEP_MS`), deep sleep with touch/button/IMU/RTC wake; `Balanced`/`Power-saver` profiles; reconnect+resync on wake.
+
+🎯 **M4**: watch face shows time/date/GPS/battery; MENU → Wi-Fi setup provisions over
+the on-watch AP; MENU → Task list shows the live list and a browser-typed note
+appears on the wrist in < 1 s; idle returns to the watch face in 30 s and the device
+dims/sleeps; survives Wi-Fi drop and deep-sleep wake (reconnect + resync).
 
 ---
 
@@ -102,7 +116,7 @@ Goal: live URL, watch points at prod. Ref [`specs/08-deployment.md`](specs/08-de
 - ⬜ Deploy backend container (Render/Railway/Fly); set env group; **verify WS (`wss://`) passes through** the proxy.
 - ⬜ Deploy frontend static build (Netlify/Vercel/CF Pages) with prod `VITE_*`.
 - ⬜ Set CORS/`ALLOWED_HOSTS` to prod origins; `DEBUG=false`.
-- ⬜ Rebuild firmware with prod `API_BASE/WS_BASE` (TLS) + flash.
+- ⬜ Point the watch at prod (`https`/`wss`) — via on-watch provisioning or build-time defaults — and flash.
 - ⬜ Add a keepalive ping to `/api/health` to mitigate free-tier cold starts.
 
 🎯 **M5**: end-to-end on the public URL; browser edit reflects on the watch over the

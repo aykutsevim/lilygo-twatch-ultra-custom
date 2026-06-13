@@ -21,17 +21,28 @@ no database. Notes live in Redis and are pushed to every connected client
 
 - CRUD for notes: create, list, toggle done, delete, clear-completed.
 - Real-time fan-out of changes to all connected clients.
-- A watch UI that shows the list, scrolls, and reflects live changes.
+- A multi-mode watch app (see [`06-firmware.md`](06-firmware.md)):
+  - **Watch mode** (home/default): time, date, GPS position, battery, connection.
+  - **Tasks mode**: the live todo list with light actions (toggle/delete).
+  - **Settings mode**: on-watch **Wi-Fi provisioning** (the watch opens its own
+    Wi-Fi access point + web interface to enter credentials), plus task list entry.
+  - Returns to watch mode on a back action or automatically after 30 s idle.
+- **Low-power operation**: the watch uses the ESP32-S3 power-management features
+  (backlight dimming, CPU scaling, Wi-Fi modem sleep, light/deep sleep with
+  touch/button/tilt/RTC wake) to maximize battery uptime.
 - Local dev via Docker Compose; deploy to a free hosting tier.
-- A single static API key shared by web + firmware (kept out of source via env).
+- A single static API key shared by web + firmware (kept out of source via env /
+  provisioned on-device).
 
 ## 1.4 Out of scope (explicitly)
 
 - User accounts, login, OAuth, multi-tenant data. **No auth beyond the shared key.**
 - Relational/SQL database, migrations of business data. **Redis only.**
-- Offline editing/sync conflict resolution on the watch (watch is mostly a viewer
-  with light actions; see [`06-firmware.md`](06-firmware.md)).
-- Push notifications, alarms, calendar, or any non-todo watch feature.
+- Creating notes *from the watch* (no good text entry) and offline edit/sync
+  conflict resolution — the watch toggles/deletes only and reconciles via resync;
+  creation is web-only. See [`06-firmware.md`](06-firmware.md).
+- Push notifications, alarms, calendar, or any non-todo watch feature beyond the
+  watch-face readouts (time/date/GPS/battery).
 - Native mobile apps.
 
 ## 1.5 Target hardware

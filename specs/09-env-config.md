@@ -51,19 +51,23 @@ VITE_API_KEY=change-me-to-a-long-random-string   # = API_KEY (not a real secret 
 | `VITE_WS_BASE`         | frontend  | yes      | —                  | WebSocket base URL (build-time)                     |
 | `VITE_API_KEY`         | frontend  | yes      | —                  | Same value as `API_KEY`                             |
 
-## 9.3 Firmware config (build-time, not env)
+## 9.3 Firmware config (runtime NVS primary, build-time optional)
 
-The watch can't read `.env` at runtime; it uses build-time config (see
-[`06-firmware.md`](06-firmware.md) §6.7). Keep real values in a git-ignored
-`firmware/include/secrets.h` or inject via PlatformIO `build_flags`:
+The watch doesn't read `.env`. Its config is **provisioned on-device at runtime**
+(on-watch AP + web UI) and persisted to **NVS**; git-ignored build-time defaults can
+pre-seed a dev unit. NVS takes precedence. See [`06-firmware.md`](06-firmware.md)
+§6.10/§6.12.
 
-| Macro       | Maps to        | Notes                                    |
-|-------------|----------------|------------------------------------------|
-| `WIFI_SSID` | —              | Wi-Fi network name                        |
-| `WIFI_PASS` | —              | Wi-Fi password                            |
-| `API_BASE`  | `VITE_API_BASE`| REST base (`https://…` in prod)           |
-| `WS_BASE`   | `VITE_WS_BASE` | WebSocket base (`wss://…` in prod)        |
-| `API_KEY`   | `API_KEY`      | Same shared key                           |
+| Key (NVS) / Macro (build-time) | Maps to         | Notes                              |
+|--------------------------------|-----------------|------------------------------------|
+| `wifi_ssid` / `WIFI_SSID`      | —               | Wi-Fi network name (provisioned)   |
+| `wifi_pass` / `WIFI_PASS`      | —               | Wi-Fi password (provisioned)       |
+| `api_base` / `DEFAULT_API_BASE`| `VITE_API_BASE` | REST base (`https://…` in prod)    |
+| `ws_base`  / `DEFAULT_WS_BASE` | `VITE_WS_BASE`  | WebSocket base (`wss://…` in prod) |
+| `api_key`  / (secrets.h)       | `API_KEY`       | Same shared key (`X-API-Key`/`?key=`) |
+
+Real build-time values go in a git-ignored `firmware/include/secrets.h` (or
+PlatformIO `build_flags`); placeholders live in committed `include/config.h`.
 
 ## 9.4 Secrets hygiene
 

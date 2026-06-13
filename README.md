@@ -18,7 +18,7 @@ type a note in the browser and it appears on your wrist within a second.
 |-------------|----------------------------------------|------------------------------------------------|
 | `backend/`  | Django, DRF, Channels, Redis           | REST API + WebSocket push, Redis data store    |
 | `frontend/` | React (Vite), TypeScript               | Web UI to view/add/complete/delete notes       |
-| `firmware/` | PlatformIO, Arduino, LVGL              | T-Watch Ultra app that displays the todo list  |
+| `firmware/` | PlatformIO, Arduino, LVGL              | Multi-mode low-power watch: watch face, live todo list, on-watch Wi-Fi setup |
 | `specs/`    | Markdown                               | Full specifications (read these first)         |
 
 ## Specs
