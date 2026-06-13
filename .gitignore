@@ -1,0 +1,27 @@
+# Secrets / env
+.env
+*.local
+firmware/include/secrets.h
+
+# Python
+**/__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+
+# Node
+node_modules/
+dist/
+
+# PlatformIO
+.pio/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+
+# Local Claude Code settings
+.claude/settings.local.json
