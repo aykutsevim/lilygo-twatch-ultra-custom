@@ -5,7 +5,11 @@ the backend, then the web client, then the watch** — so each layer can be veri
 against something already working. The API contract ([`specs/03-api-contract.md`](specs/03-api-contract.md))
 is the spine; everything else is tested against it.
 
-Legend: ⬜ not started · 🎯 milestone (independently verifiable).
+Legend: ⬜ not started · ✅ done · 🎯 milestone (independently verifiable).
+
+**Status (2026-06-14):** Phases 0–3 done and verified live against Docker.
+M0–M3 met (REST CRUD, real-time WS push through Redis, browser↔browser live
+updates). Remaining: Phase 4 (firmware), Phase 5 (deploy), Phase 6 (polish).
 
 ---
 

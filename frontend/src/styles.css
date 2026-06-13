@@ -1,0 +1,134 @@
+:root {
+  color-scheme: light dark;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+}
+
+body {
+  margin: 0;
+  background: #11141a;
+  color: #e6e8eb;
+}
+
+.app {
+  max-width: 560px;
+  margin: 3rem auto;
+  padding: 0 1rem;
+}
+
+h1 {
+  font-size: 1.5rem;
+  margin: 0 0 1rem;
+}
+
+.add {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.add input {
+  flex: 1;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid #2b313c;
+  border-radius: 8px;
+  background: #1a1e26;
+  color: inherit;
+  font-size: 1rem;
+}
+
+button {
+  padding: 0.55rem 0.9rem;
+  border: 1px solid #2b313c;
+  border-radius: 8px;
+  background: #2563eb;
+  color: white;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.5rem 0.6rem;
+  background: #1a1e26;
+  border: 1px solid #2b313c;
+  border-radius: 8px;
+}
+
+.item label {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex: 1;
+  cursor: pointer;
+}
+
+.item.done .text {
+  text-decoration: line-through;
+  opacity: 0.55;
+}
+
+.item .del {
+  background: transparent;
+  border: none;
+  color: #8b95a5;
+  font-size: 1.3rem;
+  line-height: 1;
+  padding: 0 0.3rem;
+}
+
+.item .del:hover {
+  color: #ef4444;
+}
+
+.empty {
+  color: #8b95a5;
+  text-align: center;
+  padding: 1.5rem 0;
+}
+
+.status {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1.25rem;
+  font-size: 0.85rem;
+  color: #8b95a5;
+}
+
+.status .count {
+  flex: 1;
+}
+
+.status button {
+  background: transparent;
+  color: #8b95a5;
+  font-size: 0.85rem;
+}
+
+.dot.online {
+  color: #22c55e;
+}
+.dot.connecting,
+.dot.reconnecting {
+  color: #eab308;
+}
+.dot.offline {
+  color: #ef4444;
+}
