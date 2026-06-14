@@ -1,0 +1,13 @@
+# Overlay: puts an nginx reverse proxy in front of the backend to mirror a host's
+# edge proxy and confirm WebSocket upgrades pass through.
+#   docker compose -f docker-compose.yml -f docker-compose.proxy.yml up --build
+# Then connect WS via ws://localhost:8080/ws/notes/?key=<API_KEY>.
+services:
+  proxy:
+    image: nginx:alpine
+    volumes:
+      - ./deploy/nginx-proxy.conf:/etc/nginx/nginx.conf:ro
+    ports:
+      - "8080:80"
+    depends_on:
+      - backend

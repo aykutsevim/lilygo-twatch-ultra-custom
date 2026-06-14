@@ -113,17 +113,24 @@ dims/sleeps; survives Wi-Fi drop and deep-sleep wake (reconnect + resync).
 
 ## Phase 5 — Deploy to free hosting
 
-Goal: live URL, watch points at prod. Ref [`specs/08-deployment.md`](specs/08-deployment.md).
+Goal: live URL, watch points at prod. Ref [`specs/08-deployment.md`](specs/08-deployment.md)
+and the runbook [`DEPLOY.md`](DEPLOY.md). Config is **done**; the cloud steps need
+the user's accounts.
 
-- ⬜ Provision managed Redis (Upstash); enable persistence; get `REDIS_URL`.
-- ⬜ Deploy backend container (Render/Railway/Fly); set env group; **verify WS (`wss://`) passes through** the proxy.
-- ⬜ Deploy frontend static build (Netlify/Vercel/CF Pages) with prod `VITE_*`.
-- ⬜ Set CORS/`ALLOWED_HOSTS` to prod origins; `DEBUG=false`.
-- ⬜ Point the watch at prod (`https`/`wss`) — via on-watch provisioning or build-time defaults — and flash.
-- ⬜ Add a keepalive ping to `/api/health` to mitigate free-tier cold starts.
+- ✅ Deploy artifacts authored: `render.yaml` (backend Docker + static frontend),
+  keepalive workflow, `DEPLOY.md` runbook.
+- ✅ Backend made host-ready: auto-trusts `RENDER_EXTERNAL_HOSTNAME`; `DEBUG=false`,
+  CORS/`API_KEY`/`REDIS_URL` driven by env.
+- ✅ **WS-through-proxy verified locally** (`docker-compose.proxy.yml` + nginx):
+  `wss`-style upgrade + push confirmed through an edge proxy — the main deploy risk.
+- ⬜ Provision Upstash Redis; paste `REDIS_URL` (user account).
+- ⬜ Render Blueprint deploy; fill `sync:false` env; set frontend `VITE_*` and
+  redeploy (user account).
+- ⬜ Set repo var `HEALTH_URL` to enable keepalive.
+- ⬜ Point the watch at prod (`https`/`wss`) — via on-watch provisioning.
 
 🎯 **M5**: end-to-end on the public URL; browser edit reflects on the watch over the
-internet.
+internet. (Reachable once the account-bound steps above are done.)
 
 ---
 

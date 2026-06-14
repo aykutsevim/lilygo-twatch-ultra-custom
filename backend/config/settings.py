@@ -29,6 +29,12 @@ SECRET_KEY = env("DJANGO_SECRET_KEY", "insecure-dev-key-change-me")
 DEBUG = env_bool("DEBUG", False)
 ALLOWED_HOSTS = env_list("ALLOWED_HOSTS", "localhost,127.0.0.1")
 
+# Render injects the external hostname; trust it automatically so the host does
+# not have to be hard-coded in env. (Harmless elsewhere — only added if set.)
+_render_host = env("RENDER_EXTERNAL_HOSTNAME")
+if _render_host and _render_host not in ALLOWED_HOSTS:
+    ALLOWED_HOSTS.append(_render_host)
+
 # App-specific config
 API_KEY = env("API_KEY", "")
 REDIS_URL = env("REDIS_URL", "redis://localhost:6379/0")

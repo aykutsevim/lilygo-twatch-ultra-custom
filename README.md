@@ -37,6 +37,8 @@ Read in order:
 
 Then build it: [`IMPLEMENTATION_PLAN.md`](IMPLEMENTATION_PLAN.md) — phased, milestone-gated build order.
 
+Ship it: [`DEPLOY.md`](DEPLOY.md) — free-tier deploy runbook (Render + Upstash).
+
 ## Constraints (north star)
 
 - **One user, no auth.** A static shared API key gates writes; that's it.
