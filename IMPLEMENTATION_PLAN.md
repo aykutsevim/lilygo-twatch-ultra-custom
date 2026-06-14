@@ -7,9 +7,12 @@ is the spine; everything else is tested against it.
 
 Legend: ⬜ not started · ✅ done · 🎯 milestone (independently verifiable).
 
-**Status (2026-06-14):** Phases 0–3 done and verified live against Docker.
-M0–M3 met (REST CRUD, real-time WS push through Redis, browser↔browser live
-updates). Remaining: Phase 4 (firmware), Phase 5 (deploy), Phase 6 (polish).
+**Status (2026-06-14):** Phases 0–3 done and verified live against Docker
+(M0–M3: REST CRUD, real-time WS push through Redis, browser↔browser live updates).
+Phase 4 firmware **scaffolded**: full module set + on-watch provisioning + power
+ladder written; Arduino-free core logic (NoteStore `rev` rules, ModeManager
+transitions) host-tested green. Remaining for M4: implement `hw/Board` against the
+LilyGo BSP and verify on real hardware. Then Phase 5 (deploy), Phase 6 (polish).
 
 ---
 
