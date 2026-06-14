@@ -59,6 +59,30 @@ curl -s -X POST https://watchtodo-backend.onrender.com/api/notes \
 # Open the web URL in two tabs -> live updates. Then point the watch at the URLs.
 ```
 
+## 2b. Frontend on Vercel (alternative to Render static)
+
+Vercel hosts the React frontend nicely; it **cannot** host the backend (the Django
+app is a persistent ASGI server with WebSockets — not serverless). Deploy the
+backend on Render/Railway/Fly first, then:
+
+1. Vercel → **Add New → Project** → import this repo.
+2. **Root Directory: `frontend`** (Vercel reads `frontend/vercel.json`: Vite preset,
+   `npm ci` / `npm run build` → `dist`, SPA rewrite).
+3. Environment Variables (Production), then deploy:
+   | Var | Value |
+   |-----|-------|
+   | `VITE_API_BASE` | `https://watchtodo-backend.onrender.com` |
+   | `VITE_WS_BASE` | `wss://watchtodo-backend.onrender.com` |
+   | `VITE_API_KEY` | same as backend `API_KEY` |
+4. Set the backend's `CORS_ALLOWED_ORIGINS` to the Vercel URL
+   (e.g. `https://watchtodo.vercel.app`) and redeploy the backend.
+
+If you use Vercel for the frontend, you can delete the `watchtodo-web` service from
+`render.yaml` (keep only `watchtodo-backend`).
+
+> Vercel CLI path: `cd frontend && npx vercel` (login once), set the env vars with
+> `npx vercel env add VITE_API_BASE` etc., then `npx vercel --prod`.
+
 ## 3. Cold-start keepalive
 
 Free web services sleep when idle; the first request then waits for a wake-up

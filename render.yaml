@@ -1,10 +1,11 @@
-# Render Blueprint — deploys the backend (Docker) and the React frontend (static)
-# on the free tier. Redis is external (Upstash free tier); paste its URL into
-# REDIS_URL. See DEPLOY.md for the full runbook.
+# Render Blueprint — deploys the backend (Django ASGI: REST + WebSocket) as a
+# Docker web service on the free tier. Redis is external (Upstash free tier);
+# paste its URL into REDIS_URL. The frontend is deployed separately on Vercel
+# (see DEPLOY.md §2b).
 #
 # One-time: in Render, "New +" -> "Blueprint" -> point at this repo. Then fill the
-# env vars marked `sync: false` in the dashboard (they are intentionally not in
-# git: secrets and cross-service URLs).
+# env vars marked `sync: false` in the dashboard (intentionally not in git:
+# secrets and cross-service URLs).
 
 services:
   # ── Backend: Django ASGI (REST + WebSocket) in one container ──
@@ -16,11 +17,11 @@ services:
     dockerContext: ./backend
     healthCheckPath: /api/health        # public, pings Redis
     envVars:
-      - key: REDIS_URL                   # Upstash redis(s):// URL
+      - key: REDIS_URL                   # Upstash rediss:// URL
         sync: false
       - key: API_KEY                     # long random shared key
         sync: false
-      - key: CORS_ALLOWED_ORIGINS        # the deployed frontend origin(s)
+      - key: CORS_ALLOWED_ORIGINS        # the Vercel frontend origin
         sync: false
       - key: DJANGO_SECRET_KEY
         generateValue: true              # Render generates a strong value
@@ -29,24 +30,3 @@ services:
       - key: WS_PING_INTERVAL
         value: "25"
       # ALLOWED_HOSTS is auto-filled from RENDER_EXTERNAL_HOSTNAME (settings.py).
-
-  # ── Frontend: static React build served by Render's CDN ──
-  - type: web
-    name: watchtodo-web
-    runtime: static
-    plan: free
-    rootDir: frontend
-    buildCommand: npm ci && npm run build
-    staticPublishPath: dist
-    # SPA fallback so client routes resolve.
-    routes:
-      - type: rewrite
-        source: /*
-        destination: /index.html
-    envVars:
-      - key: VITE_API_BASE               # https://watchtodo-backend.onrender.com
-        sync: false
-      - key: VITE_WS_BASE                # wss://watchtodo-backend.onrender.com
-        sync: false
-      - key: VITE_API_KEY                # = backend API_KEY
-        sync: false
