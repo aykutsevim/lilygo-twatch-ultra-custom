@@ -1,9 +1,19 @@
-// Centralizes build-time config. Empty bases => same-origin (Vite dev proxy).
+// Centralizes config. Priority: runtime config injected by the backend
+// (window.__WT_CONFIG__) > build-time VITE_* (vite dev). Empty bases => the app
+// talks to its own origin (single-image deploy / Vite dev proxy).
 
-const API_BASE = (import.meta.env.VITE_API_BASE ?? "").replace(/\/$/, "");
-const WS_BASE = (import.meta.env.VITE_WS_BASE ?? "").replace(/\/$/, "");
+type RuntimeConfig = { apiBase?: string; wsBase?: string; apiKey?: string };
+const rc: RuntimeConfig = (window as unknown as { __WT_CONFIG__?: RuntimeConfig })
+  .__WT_CONFIG__ ?? {};
 
-export const API_KEY = import.meta.env.VITE_API_KEY ?? "";
+// Ignore the un-replaced placeholder when running `vite dev`.
+const injectedKey =
+  rc.apiKey && !rc.apiKey.startsWith("__") ? rc.apiKey : undefined;
+
+const API_BASE = (rc.apiBase ?? import.meta.env.VITE_API_BASE ?? "").replace(/\/$/, "");
+const WS_BASE = (rc.wsBase ?? import.meta.env.VITE_WS_BASE ?? "").replace(/\/$/, "");
+
+export const API_KEY = injectedKey ?? import.meta.env.VITE_API_KEY ?? "";
 
 export function apiUrl(path: string): string {
   return `${API_BASE}${path}`;
@@ -11,7 +21,7 @@ export function apiUrl(path: string): string {
 
 export function wsUrl(path: string): string {
   if (WS_BASE) return `${WS_BASE}${path}`;
-  // Same-origin fallback (dev proxy): derive ws(s) from page origin.
+  // Same-origin: derive ws(s) from the page origin.
   const proto = window.location.protocol === "https:" ? "wss:" : "ws:";
   return `${proto}//${window.location.host}${path}`;
 }

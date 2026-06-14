@@ -1,41 +1,29 @@
+# Local run = the same single image you deploy: one `app` (SPA + API + WebSocket)
+# plus Redis. `docker compose up --build` -> open http://localhost:8000
 services:
   redis:
     image: redis:7-alpine
     command: ["redis-server", "--appendonly", "yes"]
     volumes:
       - redisdata:/data
-    ports:
-      - "6379:6379"
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 5s
       timeout: 3s
       retries: 5
 
-  backend:
-    build: ./backend
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
     env_file: .env
     environment:
       REDIS_URL: redis://redis:6379/0
-      ALLOWED_HOSTS: localhost,127.0.0.1,backend
     depends_on:
       redis:
         condition: service_healthy
     ports:
       - "8000:8000"
-
-  frontend:
-    build:
-      context: ./frontend
-      # VITE_* are baked at build time, so they are passed as build args.
-      args:
-        VITE_API_BASE: ${VITE_API_BASE:-http://localhost:8000}
-        VITE_WS_BASE: ${VITE_WS_BASE:-ws://localhost:8000}
-        VITE_API_KEY: ${API_KEY:-change-me-to-a-long-random-string}
-    ports:
-      - "5173:80"
-    depends_on:
-      - backend
 
 volumes:
   redisdata:

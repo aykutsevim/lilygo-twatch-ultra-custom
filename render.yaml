@@ -1,32 +1,27 @@
-# Render Blueprint — deploys the backend (Django ASGI: REST + WebSocket) as a
-# Docker web service on the free tier. Redis is external (Upstash free tier);
-# paste its URL into REDIS_URL. The frontend is deployed separately on Vercel
-# (see DEPLOY.md §2b).
+# Render Blueprint — deploys WatchTodo as ONE Docker web service (the SPA + REST
+# + WebSocket in a single image). Redis is external (Upstash free tier). See
+# DEPLOY.md for the step-by-step.
 #
-# One-time: in Render, "New +" -> "Blueprint" -> point at this repo. Then fill the
-# env vars marked `sync: false` in the dashboard (intentionally not in git:
-# secrets and cross-service URLs).
-
+# One-time: Render -> "New +" -> "Blueprint" -> select this repo. Then set the two
+# env vars marked `sync: false` in the dashboard (kept out of git).
 services:
-  # ── Backend: Django ASGI (REST + WebSocket) in one container ──
   - type: web
-    name: watchtodo-backend
+    name: watchtodo
     runtime: docker
     plan: free
-    dockerfilePath: ./backend/Dockerfile
-    dockerContext: ./backend
-    healthCheckPath: /api/health        # public, pings Redis
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    healthCheckPath: /api/health      # public; pings Redis
     envVars:
-      - key: REDIS_URL                   # Upstash rediss:// URL
+      - key: REDIS_URL                 # Upstash rediss:// URL
         sync: false
-      - key: API_KEY                     # long random shared key
-        sync: false
-      - key: CORS_ALLOWED_ORIGINS        # the Vercel frontend origin
+      - key: API_KEY                   # long random shared key (watch + web)
         sync: false
       - key: DJANGO_SECRET_KEY
-        generateValue: true              # Render generates a strong value
+        generateValue: true            # Render generates a strong value
       - key: DEBUG
         value: "false"
       - key: WS_PING_INTERVAL
         value: "25"
-      # ALLOWED_HOSTS is auto-filled from RENDER_EXTERNAL_HOSTNAME (settings.py).
+      # ALLOWED_HOSTS auto-filled from RENDER_EXTERNAL_HOSTNAME (settings.py).
+      # No CORS / VITE_* needed: the frontend is served same-origin by this app.

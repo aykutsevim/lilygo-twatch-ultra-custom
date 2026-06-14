@@ -4,6 +4,12 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>WatchTodo</title>
+    <!-- Runtime config. When the backend serves this page it injects the API key
+         and leaves the bases empty (same-origin). In `vite dev` the placeholder
+         is left as-is and the app falls back to VITE_* from .env. -->
+    <script>
+      window.__WT_CONFIG__ = { apiBase: "", wsBase: "", apiKey: "__WATCHTODO_API_KEY__" };
+    </script>
   </head>
   <body>
     <div id="root"></div>

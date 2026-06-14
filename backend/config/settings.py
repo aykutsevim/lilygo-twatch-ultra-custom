@@ -109,6 +109,14 @@ USE_TZ = True
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
+# ─── Single-image deploy: serve the built React SPA from this app ─────────
+# The Docker build copies frontend/dist -> /app/web. When present, Django serves
+# the SPA (same origin as the API + WebSocket), so no separate frontend service,
+# no CORS, and no cross-service URLs are needed. Absent (plain `manage.py` /
+# API-only dev) -> only /api is served and the React dev server is used instead.
+WEB_DIR = BASE_DIR / "web"
+SERVE_FRONTEND = (WEB_DIR / "index.html").exists()
+
 # ─── Logging (stdout, 12-factor) ─────────────────────────────────────────
 LOGGING = {
     "version": 1,

@@ -1,0 +1,16 @@
+# Keep the build context small and avoid copying host-built deps/artifacts.
+.git
+**/node_modules
+**/dist
+**/.venv
+venv/
+**/__pycache__/
+**/.pytest_cache/
+**/.pio/
+.env
+*.md
+specs/
+firmware/
+deploy/
+docker-compose*.yml
+.github/
